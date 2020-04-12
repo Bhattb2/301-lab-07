@@ -1,0 +1,38 @@
+body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+  }
+  
+  header, main, footer {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+  }
+  
+  button {
+    background: green;
+    width: 25%;
+    margin: auto;
+  }
+  
+  h1 {
+    text-align: center;
+    background: beige;
+    width: 60%;
+    margin: auto;
+    margin-bottom: 5%;
+  }
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+  }
+  
+  footer {
+    border-top: solid 1px black;
+    margin-top: 300px;
+    text-align: center;
+  }
