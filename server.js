@@ -21,25 +21,46 @@ function locationFunction (request, response) {
   try{
   const url = 'https://us1.locationiq.com/v1/search.php';
   // const geoData = require('./data/geo.json');
-  const city = request.query.city;
-  const locationData = new Location(city, geoData);
+  let city = request.query.city;
+  const queryStringParams = {
+      key: process.env.GEOCODE_API_KEY,
+      q: city,
+      format: 'json',
+      limit: 1,
+  };
+  superagent.get(url)
+  .query (queryStringParams)
+  .then( data => {
+      let locationData = data.body[0];
+      console.log(locationData);
+      let location = new Location(city, locationData);
+      console.log(location)
+      response.status(200).json(location);
+
+  });
+}
   
-console.log (city); 
-response.status(200).json(locationData);
-} catch{
+// console.log (city); 
+// response.status(200).json(locationData);
+catch{
   errorHandler('so sorry, something went wrong.', request, response);
 }
 }
 
-//getting the weather forecast for location
+// //getting the weather forecast for location
 app.get('/weather', weatherFunction);
 function weatherFunction (request, response){
   try {
-    const weatherUrl = 'https://api.darksky.net/forecast/38199e0a68afb5aa0c8dc98806386037/37.8267,-122.4233';
-    let {latitude,} = request.query;
-    let {longitude} = request.query;
-    const weather = request.query.weather;
-    const weatherBuilder = new WeatherConstructor(daily, weatherData);
+      let latitude = request.query.latitude;
+      let longitude = request.query.longitude;
+      // const weather = request.query.weather;
+      const weatherUrl = `https://api.darksky.net/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
+      return superagent.get(weatherUrl)
+      .then(weatherData =>{
+          
+      })
+    // const weatherBuilder = new WeatherConstructor(daily, weatherData);
+
 
     console.log(weather);
     response.send(weatherArray);
@@ -48,7 +69,7 @@ function weatherFunction (request, response){
   catch(error){
     errorHandler('so sorry, something went wrong.', request, response);
   }
-})
+}
 
 
 // weather constructor
@@ -60,9 +81,9 @@ this.forecast = forecast;
 // constructor function to get information from geo.json file
 function Location (city, geoData) {
   this.search_query = city;
-  this.formatted_query = geoData[0].display_name;
-  this.latitude = geoData[0].lat;
-  this.longitude = geoData[0].lon;
+  this.formatted_query = geoData.display_name;
+  this.latitude = geoData.lat;
+  this.longitude = geoData.lon;
 }
 
 //  constructor error handler
