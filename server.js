@@ -32,9 +32,9 @@ function locationFunction (request, response) {
   .query (queryStringParams)
   .then( data => {
       let locationData = data.body[0];
-      console.log(locationData);
+      console.log('this is index 1 of location data returned',locationData);
       let location = new Location(city, locationData);
-      console.log(location)
+      console.log('this is the locationafter the constructor', location)
       response.status(200).json(location);
 
   });
@@ -54,10 +54,10 @@ function weatherFunction (request, response){
       let latitude = request.query.latitude;
       let longitude = request.query.longitude;
       // const weather = request.query.weather;
-      const weatherUrl = `https://api.darksky.net/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
+      const weatherUrl = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
       return superagent.get(weatherUrl)
       .then(weatherData =>{
-          
+       console.log('weatherData', weatherData)  
       })
     // const weatherBuilder = new WeatherConstructor(daily, weatherData);
 
@@ -84,6 +84,8 @@ function Location (city, geoData) {
   this.formatted_query = geoData.display_name;
   this.latitude = geoData.lat;
   this.longitude = geoData.lon;
+  this.icon = geoData.icon;
+  
 }
 
 //  constructor error handler
