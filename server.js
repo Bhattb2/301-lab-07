@@ -16,10 +16,12 @@ app.use(cors());
 //  path to location
 let weatherArray = [];
 
+
+
 app.get('/location', locationFunction);
 function locationFunction (request, response) {
-  try{
   const url = 'https://us1.locationiq.com/v1/search.php';
+  // console.log('this is broken')
   // const geoData = require('./data/geo.json');
   let city = request.query.city;
   const queryStringParams = {
@@ -32,50 +34,57 @@ function locationFunction (request, response) {
   .query (queryStringParams)
   .then( data => {
       let locationData = data.body[0];
-      console.log('this is index 1 of location data returned',locationData);
+      // console.log(locationData);
       let location = new Location(city, locationData);
-      console.log('this is the locationafter the constructor', location)
-      response.status(200).json(location);
+      // console.log(location)
+      response.json(location);
 
-  });
+  })
+.catch(err => {
+  errorHandler(err, request, response);
+})
 }
-  
-// console.log (city); 
-// response.status(200).json(locationData);
-catch{
-  errorHandler('so sorry, something went wrong.', request, response);
-}
-}
+
 
 // //getting the weather forecast for location
 app.get('/weather', weatherFunction);
 function weatherFunction (request, response){
-  try {
+  
       let latitude = request.query.latitude;
       let longitude = request.query.longitude;
       // const weather = request.query.weather;
       const weatherUrl = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
+      // console.log(weatherUrl);
       return superagent.get(weatherUrl)
-      .then(weatherData =>{
-       console.log('weatherData', weatherData)  
+      .then(response =>{
+       let weatherData = response.body.daily.data;
+       let weather = weatherData.map( day => {
+         return new WeatherConstructor(day);
+       });
+      //  console.log(weather); 
+       response.status(200).json(weather);
       })
+      .catch(err => {
+        console.log(err);
+        response.status(500).send('Weather Broke');
+      });
     // const weatherBuilder = new WeatherConstructor(daily, weatherData);
 
 
-    console.log(weather);
-    response.send(weatherArray);
-    console.log(weatherArray);
-  }
-  catch(error){
-    errorHandler('so sorry, something went wrong.', request, response);
-  }
+  //   console.log(weather);
+  //   response.send(weatherArray);
+  //   console.log(weatherArray);
+  // }
+//   catch(error){
+//     errorHandler('so sorry, something went wrong.', request, response);
+//   }
 }
 
 
 // weather constructor
-function WeatherConstructor(time, forecast){
-this.time = new Date(time*1000).toString;
-this.forecast = forecast;
+function WeatherConstructor(day) {
+this.time = new Date(day, time*1000).toString;
+this.forecast = day.summary;
 }
 
 // constructor function to get information from geo.json file
@@ -84,7 +93,6 @@ function Location (city, geoData) {
   this.formatted_query = geoData.display_name;
   this.latitude = geoData.lat;
   this.longitude = geoData.lon;
-  this.icon = geoData.icon;
   
 }
 
