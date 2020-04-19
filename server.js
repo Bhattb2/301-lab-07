@@ -17,12 +17,9 @@ app.use(cors());
 let weatherArray = [];
 
 
-
 app.get('/location', locationFunction);
 function locationFunction (request, response) {
   const url = 'https://us1.locationiq.com/v1/search.php';
-  // console.log('this is broken')
-  // const geoData = require('./data/geo.json');
   let city = request.query.city;
   const queryStringParams = {
       key: process.env.GEOCODE_API_KEY,
@@ -34,9 +31,7 @@ function locationFunction (request, response) {
   .query (queryStringParams)
   .then( data => {
       let locationData = data.body[0];
-      // console.log(locationData);
       let location = new Location(city, locationData);
-      // console.log(location)
       response.json(location);
 
   })
@@ -44,7 +39,6 @@ function locationFunction (request, response) {
   errorHandler(err, request, response);
 })
 }
-
 
 // //getting the weather forecast for location
 app.get('/weather', weatherFunction);
@@ -68,18 +62,9 @@ function weatherFunction (request, response){
         console.log(err);
         response.status(500).send('Weather Broke');
       });
-    // const weatherBuilder = new WeatherConstructor(daily, weatherData);
 
-
-  //   console.log(weather);
-  //   response.send(weatherArray);
-  //   console.log(weatherArray);
-  // }
-//   catch(error){
-//     errorHandler('so sorry, something went wrong.', request, response);
-//   }
-}
-
+    }
+    
 
 // weather constructor
 function WeatherConstructor(day) {
