@@ -16,7 +16,7 @@ app.use(cors());
 // paths
 //  path to location
 let weatherArray = [];
-
+let trailsArray = [];
 
 // LOCATION
 
@@ -102,12 +102,12 @@ function trailsFunction (request, response){
       const trailsUrl = `https://www.hikingproject.com/data/get-trails/${process.env.TRAIL_API_KEY}/${latitude},${longitude}`;
       // console.log(weatherUrl);
       return superagent.get(trailsUrl)
-      .then(result =>{
+      .then(result => {
           let trailsData = result.body.daily.data;
           console.log(`trailsData is`)
           console.log(trailsData[0])
        let parsedTrails = JSON.parse(result.text);   
-       let trailsList = parsedTrails.trails.map( day => {
+       let trailList = parsedTrails.trails.map( value => {
          return new Trails(value);
         });
        console.log(trails) 
@@ -134,7 +134,7 @@ function Trails(trail) {
       })
       .catch(err => {
         console.log(err);
-        response.status(500).send('Weather Broke');
+        response.status(500).send('Trails Broke');
       });
 
     }
