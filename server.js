@@ -1,21 +1,25 @@
-  
 'use strict';
 
-//   require libraries server build
+// REQUIRE LIBRARIES /////
 require('dotenv').config();
 const express = require('express'); 
 const cors = require('cors');
 const app = express();
+
+// INTERACT WITH APIs /////
 const superagent = require('superagent');
 
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 
-// paths
+// PATHS /////
 //  path to location
 let weatherArray = [];
+let trailsArray = [];
 
+
+// LOCATION /////
 
 app.get('/location', locationFunction);
 function locationFunction (request, response) {
@@ -30,49 +34,18 @@ function locationFunction (request, response) {
   superagent.get(url)
   .query (queryStringParams)
   .then( data => {
-      let locationData = data.body[0];
-      let location = new Location(city, locationData);
-      response.json(location);
-
-  })
-.catch(err => {
-  errorHandler(err, request, response);
-})
-}
-
-// //getting the weather forecast for location
-app.get('/weather', weatherFunction);
-function weatherFunction (request, response){
-  
-      let latitude = request.query.latitude;
-      let longitude = request.query.longitude;
-      // const weather = request.query.weather;
-      const weatherUrl = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
-      // console.log(weatherUrl);
-      return superagent.get(weatherUrl)
-      .then(response =>{
-       let weatherData = response.body.daily.data;
-       let weather = weatherData.map( day => {
-         return new WeatherConstructor(day);
-       });
-      //  console.log(weather); 
-       response.status(200).json(weather);
-      })
-      .catch(err => {
-        console.log(err);
-        response.status(500).send('Weather Broke');
-      });
-
-    }
+    let locationData = data.body[0];
+    let location = new Location(city, locationData);
+    response.json(location);
     
-
-// weather constructor
-function WeatherConstructor(day) {
-this.time = new Date(day, time*1000).toString;
-this.forecast = day.summary;
+  })
+  .catch(err => {
+    errorHandler(err, request, response);
+  })
 }
 
-// constructor function to get information from geo.json file
+
+// LOCATION CONSTRUCTOR to get information from geo.json file /////
 function Location (city, geoData) {
   this.search_query = city;
   this.formatted_query = geoData.display_name;
@@ -81,11 +54,96 @@ function Location (city, geoData) {
   
 }
 
-//  constructor error handler
-const errorHandler = (error, request, response) => {
-  response.status(500).send(error);
+
+// WEATHER /////
+// //getting the weather forecast for location
+app.get('/weather', weatherFunction);
+function weatherFunction (request, response){
+  
+      let latitude = request.query.latitude;
+      // console.log(latitude)
+      let longitude = request.query.longitude;
+      const weatherUrl = `https://api.darksky.net/forecast/${process.env.WEATHER_API_KEY}/${latitude},${longitude}`;
+      return superagent.get(weatherUrl)
+      .then(result => {
+          let weatherData = result.body.daily.data;
+          // console.log(`weatherData is`)
+          // console.log(weatherData[0])
+       let weather = weatherData.map( day => {
+         return new WeatherConstructor(day);
+        });
+      //  console.log(weather) 
+        response.status(200).json(weather);
+    
+      })
+      .catch(err => {
+        console.log(err);
+        response.status(500).send('Weather Broke');
+      });
+
+    }
+ 
+
+// WEATHER CONSTRUCTOR /////
+function WeatherConstructor(day) {
+    console.log(day.forecast)
+this.forecast = day.summary;
+this.time = new Date(day.time*1000).toString();
 }
 
 
-//  activate the PORT
+// TRAILS /////
+// getting trails data 
+app.get('/trails', trailsFunction);
+function trailsFunction (request, response){
+  
+      let latitude = request.query.latitude;
+      let longitude = request.query.longitude;
+      const trailsUrl = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`;
+       return superagent.get(trailsUrl)
+      .then(data => {
+        console.log (data);
+        let trailsData = data.text;
+          // console.log(`trailsData is`)
+          // console.log(trailsData[0])
+       let parsedTrails = JSON.parse(data.text); 
+              console.log (parsedTrails)  
+       let trailsList = parsedTrails.trails.map( value => {
+         return new Trails(value);
+        });
+      //   console.log ('hike', trailsList);
+      //  console.log(trails) 
+        response.status(200).json(trailsList);
+
+        
+// TRAILS ERROR HANDLER /////
+
+      })
+      .catch(err => {
+        console.log(err);
+        response.status(500).send('Trails is Broken');
+      });
+
+      }
+
+//  TRAILS CONSTRUCTOR /////
+function Trails(trail) {
+  this.name = trail.name;
+  this.location = trail.location;
+  this.length = trail.length;
+  this.stars = trail.stars;
+  this.star_votes = trail.starVotes;
+  this.summary = trail.summary;
+  this.trail.url =trail.url
+  this.conditions = trail.conditionDetails;
+  this.condition_date = trail.conditionDate.slice(0,10);
+  this.condition_time = trail.conditionDate.slice(11,18);
+
+}
+// const errorHandler = (error, request, response) => {
+//   response.status(500).send(error);
+// }
+
+
+//  ACTIVATE the PORT /////
 app.listen(PORT,() => console.log(`Listening on port ${PORT}`));
