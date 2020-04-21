@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width">
+  <title>People APP</title>
+  <link href="style.css" rel="stylesheet" type="text/css" />
+  <script id="name-template" type="x-tmpl-mustache">
+      <li>Newly Hired: {{name}}</li>
+    </script>
+</head>
+
+<body>
+  <header>
+    <h1>People APP</h1>
+  </header>
+  <main>
+    <button id="go" type="button">GO</button>
+
+    <section>
+      <ul id="people">
+        <li>Adam</li>
+        <li>Brendon</li>
+        <li>Chuck</li>
+        <li>Lami</li>
+      </ul>
+    </section>
+  </main>
+  <footer>
+    This markup was made by the German team
+  </footer>
+
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mustache.js/3.1.0/mustache.js">
+  </script>
+  <script src="https://code.jquery.com/jquery-3.4.1.js">
+  </script>
+  <script src="app.js"></script>
+</body>
+
+</html>
+
+
+<!--
+// get all scripts
+  - jQuery
+  - Mustache
+  - app.js
+// templates
+  script - x-tmpl-Mustache id = "name-template"
+        <li>Name: {{name}}</li>
+// markup
+    create a button - GO
+    <button id="button" type="button"> GO </button>
+    section #people
+      <ul>
+        <li></li>
+      </ul>
+    /section
+// css
+  center some stuff
+  style some stuff -->
