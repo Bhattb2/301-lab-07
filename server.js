@@ -67,12 +67,10 @@ function weatherFunction (request, response){
       return superagent.get(weatherUrl)
       .then(result => {
           let weatherData = result.body.daily.data;
-          // console.log(`weatherData is`)
-          // console.log(weatherData[0])
-       let weather = weatherData.map( day => {
+          let weather = weatherData.map( day => {
          return new WeatherConstructor(day);
         });
-      //  console.log(weather) 
+      
         response.status(200).json(weather);
     
       })
@@ -99,20 +97,14 @@ function trailsFunction (request, response){
   
       let latitude = request.query.latitude;
       let longitude = request.query.longitude;
-      const trailsUrl = `https://www.hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`;
+      const trailsUrl = `https://hikingproject.com/data/get-trails?lat=${latitude}&lon=${longitude}&maxDistance=10&key=${process.env.TRAIL_API_KEY}`;
        return superagent.get(trailsUrl)
       .then(data => {
         console.log (data);
-        let trailsData = data.text;
-          // console.log(`trailsData is`)
-          // console.log(trailsData[0])
-       let parsedTrails = JSON.parse(data.text); 
-              console.log (parsedTrails)  
-       let trailsList = parsedTrails.trails.map( value => {
+          
+        let trailsList = data.body.trails.map( value => {
          return new Trails(value);
         });
-      //   console.log ('hike', trailsList);
-      //  console.log(trails) 
         response.status(200).json(trailsList);
 
         
@@ -134,7 +126,7 @@ function Trails(trail) {
   this.stars = trail.stars;
   this.star_votes = trail.starVotes;
   this.summary = trail.summary;
-  this.trail.url =trail.url
+  this.url = trail.url
   this.conditions = trail.conditionDetails;
   this.condition_date = trail.conditionDate.slice(0,10);
   this.condition_time = trail.conditionDate.slice(11,18);
